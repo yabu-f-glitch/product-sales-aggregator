@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品売上入力・集計プログラム</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+
+        .input-section {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .input-field {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            flex: 1;
+            min-width: 100px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn-add {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .btn-add:hover {
+            background-color: #45a049;
+        }
+
+        .btn-calculate {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        .btn-calculate:hover {
+            background-color: #0b7dda;
+        }
+
+        .btn-clear {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            background-color: #da190b;
+        }
+
+        .data-section {
+            margin-top: 30px;
+        }
+
+        .data-section h2 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table th {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .delete-btn {
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .delete-btn:hover {
+            background-color: #ff5252;
+        }
+
+        .results-section {
+            background-color: #e3f2fd;
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid #90caf9;
+            margin-top: 20px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            font-size: 16px;
+        }
+
+        .result-label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .result-value {
+            color: #2196F3;
+            font-weight: bold;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+            font-style: italic;
+        }
+
+        .error-message {
+            color: #f44336;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>商品売上入力・集計プログラム</h1>
+
+        <div class="input-section">
+            <div class="input-group">
+                <div class="input-field">
+                    <label for="productName">商品名</label>
+                    <input type="text" id="productName" placeholder="商品名を入力">
+                </div>
+                <div class="input-field">
+                    <label for="price">金額</label>
+                    <input type="number" id="price" placeholder="金額を入力" min="0" step="0.01">
+                </div>
+            </div>
+            <div id="errorMessage" class="error-message"></div>
+            <div class="button-group">
+                <button class="btn-add" onclick="addProduct()">追加</button>
+                <button class="btn-calculate" onclick="calculateResults()">集計</button>
+                <button class="btn-clear" onclick="clearAllData()">クリア</button>
+            </div>
+        </div>
+
+        <div class="data-section">
+            <h2>入力済み商品</h2>
+            <div id="dataTable"></div>
+        </div>
+
+        <div id="resultsContainer" style="display: none;">
+            <div class="results-section">
+                <h2>集計結果</h2>
+                <div class="result-item">
+                    <span class="result-label">合計金額:</span>
+                    <span class="result-value" id="totalResult">¥0.00</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">平均金額:</span>
+                    <span class="result-value" id="averageResult">¥0.00</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">最高金額:</span>
+                    <span class="result-value" id="maxResult">¥0.00</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">最低金額:</span>
+                    <span class="result-value" id="minResult">¥0.00</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">入力件数:</span>
+                    <span class="result-value" id="countResult">0 件</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ローカルストレージから商品リストを取得
+        function getProducts() {
+            const data = localStorage.getItem('products');
+            return data ? JSON.parse(data) : [];
+        }
+
+        // 商品リストをローカルストレージに保存
+        function saveProducts(products) {
+            localStorage.setItem('products', JSON.stringify(products));
+        }
+
+        // 商品を追加
+        function addProduct() {
+            const productName = document.getElementById('productName').value.trim();
+            const price = parseFloat(document.getElementById('price').value);
+            const errorMessage = document.getElementById('errorMessage');
+
+            // バリデーション
+            if (!productName) {
+                showError('商品名を入力してください。');
+                return;
+            }
+
+            if (isNaN(price) || price < 0) {
+                showError('金額に正の数値を入力してください。');
+                return;
+            }
+
+            // 商品を追加
+            const products = getProducts();
+            products.push({ name: productName, price: price });
+            saveProducts(products);
+
+            // 入力欄をクリア
+            document.getElementById('productName').value = '';
+            document.getElementById('price').value = '';
+            errorMessage.style.display = 'none';
+            document.getElementById('productName').focus();
+
+            // テーブルを更新
+            renderTable();
+        }
+
+        // エラーメッセージを表示
+        function showError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
+
+        // テーブルを描画
+        function renderTable() {
+            const products = getProducts();
+            const tableDiv = document.getElementById('dataTable');
+
+            if (products.length === 0) {
+                tableDiv.innerHTML = '<div class="empty-message">入力されたデータはありません</div>';
+                return;
+            }
+
+            let html = '<table><thead><tr><th>番号</th><th>商品名</th><th>金額</th><th>操作</th></tr></thead><tbody>';
+
+            products.forEach((product, index) => {
+                html += `<tr>
+                    <td>${index + 1}</td>
+                    <td>${product.name}</td>
+                    <td>¥${product.price.toFixed(2)}</td>
+                    <td><button class="delete-btn" onclick="deleteProduct(${index})">削除</button></td>
+                </tr>`;
+            });
+
+            html += '</tbody></table>';
+            tableDiv.innerHTML = html;
+        }
+
+        // 商品を削除
+        function deleteProduct(index) {
+            if (confirm('この商品を削除しますか？')) {
+                const products = getProducts();
+                products.splice(index, 1);
+                saveProducts(products);
+                renderTable();
+            }
+        }
+
+        // 結果を計算
+        function calculateResults() {
+            const products = getProducts();
+
+            if (products.length === 0) {
+                alert('入力されたデータがありません。');
+                return;
+            }
+
+            const total = products.reduce((sum, p) => sum + p.price, 0);
+            const average = total / products.length;
+            const max = Math.max(...products.map(p => p.price));
+            const min = Math.min(...products.map(p => p.price));
+
+            // 結果を表示
+            document.getElementById('totalResult').textContent = `¥${total.toFixed(2)}`;
+            document.getElementById('averageResult').textContent = `¥${average.toFixed(2)}`;
+            document.getElementById('maxResult').textContent = `¥${max.toFixed(2)}`;
+            document.getElementById('minResult').textContent = `¥${min.toFixed(2)}`;
+            document.getElementById('countResult').textContent = `${products.length} 件`;
+            document.getElementById('resultsContainer').style.display = 'block';
+        }
+
+        // すべてのデータをクリア
+        function clearAllData() {
+            if (confirm('すべてのデータをクリアしますか？')) {
+                localStorage.removeItem('products');
+                renderTable();
+                document.getElementById('resultsContainer').style.display = 'none';
+            }
+        }
+
+        // ページ読み込み時にテーブルを描画
+        window.addEventListener('load', function() {
+            renderTable();
+        });
+
+        // Enterキーで追加できるようにする
+        document.getElementById('price').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                addProduct();
+            }
+        });
+    </script>
+</body>
+</html>
